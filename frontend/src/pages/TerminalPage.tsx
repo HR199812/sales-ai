@@ -3,6 +3,7 @@ import { WebLinksAddon } from "@xterm/addon-web-links";
 import { Terminal } from "@xterm/xterm";
 import type React from "react";
 import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import "@xterm/xterm/css/xterm.css";
 import "./TerminalPage.css";
 
@@ -10,6 +11,7 @@ const TERMINAL_WS = "ws://localhost:3001";
 
 const TerminalPage: React.FC = () => {
 	const containerRef = useRef<HTMLDivElement>(null);
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		if (!containerRef.current) return;
@@ -115,7 +117,19 @@ const TerminalPage: React.FC = () => {
 	return (
 		<div className="terminal-page">
 			<div className="terminal-header">
-				<span className="terminal-title">Terminal</span>
+				<div className="terminal-header-left">
+					<button
+						className="terminal-back-btn"
+						onClick={() => navigate("/chat")}
+						title="Back to chat"
+					>
+						<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+							<path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+						</svg>
+						Back
+					</button>
+					<span className="terminal-title">Terminal</span>
+				</div>
 				<span className="terminal-hint">
 					Type <code>claude</code> to start an AI session
 				</span>

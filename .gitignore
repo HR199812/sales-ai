@@ -16,6 +16,9 @@ frontend/build/
 frontend/.env.local
 frontend/.env.*.local
 
+# Terminal server
+terminal-server/node_modules/
+
 # IDE
 .vscode/
 .idea/

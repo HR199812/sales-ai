@@ -1,8 +1,9 @@
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { MessageInput } from "../components/ChatArea/MessageInput";
 import { StreamingMessage } from "../components/ChatArea/StreamingMessage";
+import { TerminalPanel } from "../components/TerminalPanel/TerminalPanel";
 import { useAuthStore } from "../stores/authStore";
 import { useChatStore } from "../stores/chatStore";
 import "./ChatPage.css";
@@ -25,6 +26,8 @@ const ChatPage: React.FC = () => {
 		setCurrentSession,
 	} = useChatStore();
 	const [sidebarOpen, setSidebarOpen] = useState(true);
+	const [terminalOpen, setTerminalOpen] = useState(false);
+	const [terminalHeight, setTerminalHeight] = useState(280);
 	const [welcomeInput, setWelcomeInput] = useState("");
 	const [autoMessage, setAutoMessage] = useState<string | null>(null);
 	const [isCreating, setIsCreating] = useState(false);
@@ -33,12 +36,10 @@ const ChatPage: React.FC = () => {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		if (!isAuthenticated || !token) {
-			navigate("/login");
-			return;
+		if (token) {
+			fetchSessions(token).catch(console.error);
 		}
-		fetchSessions(token).catch(console.error);
-	}, [isAuthenticated, token]);
+	}, [token]);
 
 	const currentSession = sessions.find((s) => s.id === currentSessionId);
 
@@ -76,6 +77,7 @@ const ChatPage: React.FC = () => {
 
 	return (
 		<div className="chat-layout">
+			<div className="chat-top">
 			{/* ── Sidebar ── */}
 			<aside className={`sidebar ${sidebarOpen ? "open" : "closed"}`}>
 				{/* Logo + compose */}
@@ -84,26 +86,6 @@ const ChatPage: React.FC = () => {
 						<div className="sidebar-logo-icon">⚡</div>
 						<span className="sidebar-logo-text">Sales AI</span>
 					</div>
-					<button
-						className="compose-btn"
-						onClick={handleNewChat}
-						title="New chat"
-					>
-						<svg
-							width="18"
-							height="18"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-							strokeWidth="2"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M12 4v16m8-8H4"
-							/>
-						</svg>
-					</button>
 				</div>
 
 				{/* Nav */}
@@ -162,7 +144,10 @@ const ChatPage: React.FC = () => {
 
 				{/* Bottom: terminal + user */}
 				<div className="sidebar-bottom">
-					<Link to="/terminal" className="terminal-nav-item">
+					<button
+						className={`terminal-nav-item ${terminalOpen ? "active" : ""}`}
+						onClick={() => setTerminalOpen((o) => !o)}
+					>
 						<svg
 							width="16"
 							height="16"
@@ -178,15 +163,26 @@ const ChatPage: React.FC = () => {
 							/>
 						</svg>
 						Terminal
-					</Link>
-					<button
-						className="sidebar-user-btn"
-						onClick={handleLogout}
-						title="Sign out"
-					>
-						<div className="user-avatar">{userInitial}</div>
-						<span className="user-email-text">{user?.email ?? "Account"}</span>
 					</button>
+					{isAuthenticated ? (
+						<button
+							className="sidebar-user-btn"
+							onClick={handleLogout}
+							title="Sign out"
+						>
+							<div className="user-avatar">{userInitial}</div>
+							<span className="user-email-text">{user?.email ?? "Account"}</span>
+						</button>
+					) : (
+						<button
+							className="sidebar-user-btn"
+							onClick={() => navigate("/login")}
+							title="Sign in"
+						>
+							<div className="user-avatar" style={{ background: "#30363d", fontSize: 16 }}>👤</div>
+							<span className="user-email-text">Sign in</span>
+						</button>
+					)}
 				</div>
 			</aside>
 
@@ -199,9 +195,27 @@ const ChatPage: React.FC = () => {
 								className="sidebar-toggle"
 								onClick={() => setSidebarOpen(!sidebarOpen)}
 							>
-								☰
+								<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+									<rect x="1.5" y="1.5" width="15" height="15" rx="3" stroke="currentColor" strokeWidth="1.5"/>
+									<rect x="1.5" y="1.5" width="5" height="15" rx="3" fill="currentColor" fillOpacity="0.15" stroke="currentColor" strokeWidth="1.5"/>
+									<line x1="6.5" y1="2" x2="6.5" y2="16" stroke="currentColor" strokeWidth="1.5"/>
+								</svg>
 							</button>
 							<h2 className="chat-title">{currentSession.title}</h2>
+							<button
+								className="clear-history-btn"
+								onClick={() => {
+									if (confirm("Clear message history for this session? This resets what the AI remembers in this conversation.")) {
+										useChatStore.getState().clearSessionMessages(currentSession.id);
+									}
+								}}
+								title="Clear conversation history"
+							>
+								<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+									<path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+								</svg>
+								Clear history
+							</button>
 						</div>
 
 						<div className="messages-area">
@@ -303,6 +317,14 @@ const ChatPage: React.FC = () => {
 					</div>
 				)}
 			</main>
+			</div>
+
+			<TerminalPanel
+				isOpen={terminalOpen}
+				height={terminalHeight}
+				onHeightChange={setTerminalHeight}
+				onClose={() => setTerminalOpen(false)}
+			/>
 		</div>
 	);
 };

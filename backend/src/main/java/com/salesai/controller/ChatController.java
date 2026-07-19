@@ -73,19 +73,27 @@ public class ChatController {
         @RequestBody SendMessageRequest request,
         Authentication auth) {
 
-        String userId = getUserId(auth);
+        // auth is null for unauthenticated (guest) requests — skip all DB persistence
+        final boolean isGuest = (auth == null || auth.getName() == null);
+        final String userId = isGuest ? null : getUserId(auth);
+
         SseEmitter emitter = new SseEmitter(120_000L);
 
-        chatService.saveMessage(sessionId, userId, Message.MessageRole.USER, request.getContent());
+        if (!isGuest) {
+            chatService.saveMessage(sessionId, userId, Message.MessageRole.USER, request.getContent());
+        }
 
-        List<Map<String, String>> context = chatService.getSessionContext(sessionId, userId);
+        // Prefer context from the client (localStorage history) to avoid MongoDB roundtrip
+        List<Map<String, String>> context =
+            (request.getContext() != null && !request.getContext().isEmpty())
+                ? request.getContext()
+                : (isGuest ? List.of() : chatService.getSessionContext(sessionId, userId));
         StringBuilder fullResponse = new StringBuilder();
 
-        claudeService.streamClaude(request.getContent(), context)
+        claudeService.streamClaude(request.getContent(), context, request.getAttachments())
             .subscribeOn(Schedulers.boundedElastic())
             .doOnNext(chunk -> {
                 try {
-                    // Only accumulate real content (not status tokens) for DB persistence
                     if (!chunk.startsWith("__STATUS__:")) {
                         fullResponse.append(chunk);
                     }
@@ -95,7 +103,9 @@ public class ChatController {
                 }
             })
             .doOnComplete(() -> {
-                chatService.saveMessage(sessionId, userId, Message.MessageRole.ASSISTANT, fullResponse.toString());
+                if (!isGuest) {
+                    chatService.saveMessage(sessionId, userId, Message.MessageRole.ASSISTANT, fullResponse.toString());
+                }
                 try {
                     emitter.send(SseEmitter.event().name("done").data("[DONE]"));
                 } catch (IOException ignored) { }

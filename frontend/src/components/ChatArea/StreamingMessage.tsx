@@ -4,6 +4,12 @@ import type { Message } from "../../types/index";
 import { ResponseRenderer } from "./ResponseRenderer";
 import "./StreamingMessage.css";
 
+const formatSize = (bytes: number): string => {
+	if (bytes < 1024) return `${bytes} B`;
+	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
 interface StreamingMessageProps {
 	message: Message;
 	userInitial?: string;
@@ -17,6 +23,7 @@ interface StateConfig {
 
 const STATE_MAP: Record<string, StateConfig> = {
 	connecting:    { label: "Connecting...",              icon: "⟳", color: "blue"   },
+	analyzing:     { label: "Analyzing your query...",    icon: "🔍", color: "blue"   },
 	agent1:        { label: "Fetching client data...",    icon: "🗄", color: "violet" },
 	agent2:        { label: "Fetching product catalog...",icon: "📦", color: "violet" },
 	agent3:        { label: "Running compliance checks...",icon:"🛡", color: "amber"  },
@@ -130,10 +137,40 @@ export const StreamingMessage: React.FC<StreamingMessageProps> = ({
 				)}
 
 				{/* ── Message content ── */}
-				{displayContent && (
+				{(displayContent || (isUser && message.attachments?.length)) ? (
 					<div className={`message-content ${isUser ? "message-content-user" : "message-content-assistant"}`}>
 						{isUser ? (
-							<span>{displayContent}</span>
+							<>
+								{message.attachments && message.attachments.length > 0 && (
+									<div className="msg-attachments">
+										{message.attachments.filter((a) => a.dataUrl).length > 0 && (
+											<div className="msg-attachment-images">
+												{message.attachments
+													.filter((a) => a.dataUrl)
+													.map((att) => (
+														<img
+															key={att.name + att.size}
+															className="msg-attachment-img"
+															src={att.dataUrl}
+															alt={att.name}
+															title={att.name}
+														/>
+													))}
+											</div>
+										)}
+										{message.attachments.filter((a) => !a.dataUrl).map((att) => (
+											<div key={att.name + att.size} className="msg-attachment-file">
+												<svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+													<path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+												</svg>
+												<span className="msg-attachment-fname">{att.name}</span>
+												<span className="msg-attachment-fsize">{formatSize(att.size)}</span>
+											</div>
+										))}
+									</div>
+								)}
+								{displayContent && <span>{displayContent}</span>}
+							</>
 						) : (
 							<ResponseRenderer
 								content={displayContent}
@@ -142,7 +179,7 @@ export const StreamingMessage: React.FC<StreamingMessageProps> = ({
 						)}
 						{message.isStreaming && <span className="cursor" />}
 					</div>
-				)}
+				) : null}
 
 				{displayContent && (
 					<div className="message-time">

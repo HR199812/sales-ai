@@ -1,9 +1,18 @@
 /* ── Layout ───────────────────────────────────────────────── */
 .chat-layout {
 	display: flex;
+	flex-direction: column;
 	height: 100vh;
 	overflow: hidden;
 	background: var(--bg-primary);
+}
+
+/* Row: sidebar + main — shrinks to give space to terminal panel */
+.chat-top {
+	display: flex;
+	flex: 1;
+	min-height: 0;
+	overflow: hidden;
 }
 
 /* ── Sidebar ──────────────────────────────────────────────── */
@@ -231,10 +240,14 @@
 	width: 100%;
 	padding: 9px 10px;
 	border-radius: 10px;
+	background: none;
+	border: none;
 	color: var(--sidebar-muted);
 	font-size: 13.5px;
 	font-weight: 500;
 	text-decoration: none;
+	text-align: left;
+	cursor: pointer;
 	transition:
 		background 0.15s,
 		color 0.15s;
@@ -243,6 +256,11 @@
 
 .terminal-nav-item:hover {
 	background: var(--sidebar-hover);
+	color: var(--sidebar-text);
+}
+
+.terminal-nav-item.active {
+	background: var(--sidebar-active);
 	color: var(--sidebar-text);
 }
 
@@ -490,6 +508,28 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+
+.clear-history-btn {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	background: none;
+	border: 1px solid var(--border);
+	color: var(--text-muted);
+	font-size: 12px;
+	font-weight: 500;
+	padding: 5px 10px;
+	border-radius: 8px;
+	cursor: pointer;
+	flex-shrink: 0;
+	transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.clear-history-btn:hover {
+	color: #ef4444;
+	border-color: rgba(239, 68, 68, 0.4);
+	background: rgba(239, 68, 68, 0.05);
 }
 
 .messages-area {

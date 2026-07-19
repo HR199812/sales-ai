@@ -1,4 +1,5 @@
-const pty = require('node-pty');
+// node-pty has a prebuilt-binary issue on Node v24/arm64 — use the multiarch prebuilt fork
+const pty = require('@homebridge/node-pty-prebuilt-multiarch');
 const { WebSocketServer } = require('ws');
 
 const PORT = process.env.TERMINAL_PORT || 3001;

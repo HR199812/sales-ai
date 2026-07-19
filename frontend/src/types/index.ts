@@ -28,6 +28,13 @@ export interface ChatSession {
 	updatedAt: string;
 }
 
+export interface MessageAttachment {
+	name: string;
+	size: number;
+	mimeType: string;
+	dataUrl?: string; // base64 data URL for images; absent for non-previewable files
+}
+
 export interface Message {
 	id: string;
 	role: "user" | "assistant";
@@ -36,6 +43,7 @@ export interface Message {
 	timestamp: string;
 	isStreaming?: boolean;
 	agentState?: string | null;
+	attachments?: MessageAttachment[];
 }
 
 export interface CreateSessionRequest {
