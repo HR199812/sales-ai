@@ -1,0 +1,172 @@
+/* ── Message row ─────────────────────────────────────────────── */
+.message {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	padding: 14px 20px;
+	max-width: 900px;
+	margin: 0 auto;
+	animation: fadeSlideIn 0.2s ease-out;
+}
+
+.message-user {
+	flex-direction: row-reverse;
+}
+
+/* ── Avatar ──────────────────────────────────────────────────── */
+.msg-avatar {
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 12px;
+	font-weight: 700;
+	flex-shrink: 0;
+	margin-top: 2px;
+}
+
+.msg-avatar-user {
+	background: linear-gradient(135deg, #6d56fa, #a78bfa);
+	color: white;
+}
+
+.msg-avatar-assistant {
+	background: #f3f4f6;
+	color: #374151;
+	border: 1px solid #e5e7eb;
+	font-size: 14px;
+}
+
+/* ── Bubble container ────────────────────────────────────────── */
+.message-bubble {
+	max-width: 72%;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.message-user .message-bubble {
+	align-items: flex-end;
+}
+
+/* Assistant bubble gets more width */
+.message-bubble-assistant {
+	max-width: 82%;
+}
+
+/* ── Content boxes ───────────────────────────────────────────── */
+.message-content {
+	border-radius: 14px;
+	font-size: 14px;
+	line-height: 1.65;
+	word-wrap: break-word;
+}
+
+/* User: solid purple pill */
+.message-content-user {
+	padding: 11px 16px;
+	background: var(--primary);
+	color: white;
+	border-bottom-right-radius: 4px;
+	white-space: pre-wrap;
+}
+
+/* Assistant: light card bubble */
+.message-content-assistant {
+	padding: 14px 16px;
+	background: #f8f9fb;
+	border: 1px solid #eaecf0;
+	border-bottom-left-radius: 4px;
+	color: var(--text-primary);
+}
+
+.message-time {
+	font-size: 11px;
+	color: var(--text-muted);
+	padding: 0 2px;
+}
+
+/* ── Streaming cursor ────────────────────────────────────────── */
+.cursor {
+	display: inline-block;
+	width: 2px;
+	height: 1em;
+	background: currentColor;
+	margin-left: 2px;
+	vertical-align: text-bottom;
+	animation: blink 0.9s step-end infinite;
+}
+
+/* ── Agent status badge ──────────────────────────────────────── */
+.agent-status-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 9px 14px;
+	border-radius: 9999px;
+	font-size: 13px;
+	font-weight: 500;
+	border: 1px solid transparent;
+	max-width: fit-content;
+	transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.agent-status-enter {
+	opacity: 1;
+	transform: translateY(0);
+	animation: statusEnter 0.25s ease-out;
+}
+
+.agent-status-exit {
+	opacity: 0;
+	transform: translateY(-4px);
+}
+
+.agent-status-blue   { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+.agent-status-violet { background: #f5f3ff; border-color: #ddd6fe; color: #6d28d9; }
+.agent-status-purple { background: #faf5ff; border-color: #e9d5ff; color: #7c3aed; }
+.agent-status-amber  { background: #fffbeb; border-color: #fde68a; color: #b45309; }
+.agent-status-green  { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
+
+.agent-status-icon       { font-size: 14px; line-height: 1; flex-shrink: 0; }
+.agent-status-icon.spin  { display: inline-block; animation: spin 1s linear infinite; }
+.agent-status-icon.pulse-dot { animation: pulse-scale 1.6s ease-in-out infinite; }
+.agent-status-label      { white-space: nowrap; }
+
+.agent-status-dots          { display: flex; gap: 3px; align-items: center; }
+.agent-status-dots span     { width: 4px; height: 4px; border-radius: 50%; background: currentColor; opacity: 0.4; animation: dot-bounce 1.4s ease-in-out infinite; }
+.agent-status-dots span:nth-child(2) { animation-delay: 0.2s; }
+.agent-status-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+/* ── Animations ──────────────────────────────────────────────── */
+@keyframes statusEnter {
+	from { opacity: 0; transform: translateY(6px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes dot-bounce {
+	0%, 80%, 100% { opacity: 0.25; transform: scale(0.8); }
+	40%            { opacity: 1;   transform: scale(1.2); }
+}
+
+@keyframes spin {
+	from { transform: rotate(0deg); }
+	to   { transform: rotate(360deg); }
+}
+
+@keyframes pulse-scale {
+	0%, 100% { transform: scale(1);   opacity: 0.8; }
+	50%       { transform: scale(1.3); opacity: 1;   }
+}
+
+@keyframes blink {
+	0%, 100% { opacity: 1; }
+	50%       { opacity: 0; }
+}
+
+@keyframes fadeSlideIn {
+	from { opacity: 0; transform: translateY(8px); }
+	to   { opacity: 1; transform: translateY(0);   }
+}

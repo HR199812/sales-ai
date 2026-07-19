@@ -1,0 +1,13 @@
+{
+  "name": "sales-ai-terminal-server",
+  "version": "1.0.0",
+  "description": "PTY WebSocket bridge for in-browser terminal",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "node-pty": "^1.0.0",
+    "ws": "^8.18.0"
+  }
+}

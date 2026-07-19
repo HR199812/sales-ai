@@ -1,0 +1,52 @@
+.terminal-page {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	background: #0d1117;
+}
+
+.terminal-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 10px 16px;
+	background: #161b22;
+	border-bottom: 1px solid #30363d;
+	flex-shrink: 0;
+}
+
+.terminal-title {
+	font-size: 14px;
+	font-weight: 600;
+	color: #c9d1d9;
+	font-family: "Menlo", "Monaco", monospace;
+}
+
+.terminal-hint {
+	font-size: 12px;
+	color: #6e7681;
+	font-family: "Menlo", "Monaco", monospace;
+}
+
+.terminal-hint code {
+	background: #21262d;
+	color: #58a6ff;
+	padding: 2px 6px;
+	border-radius: 4px;
+	font-size: 12px;
+}
+
+.terminal-container {
+	flex: 1;
+	padding: 8px;
+	overflow: hidden;
+}
+
+/* Make xterm fill the container */
+.terminal-container .xterm {
+	height: 100%;
+}
+
+.terminal-container .xterm-viewport {
+	overflow-y: auto;
+}
